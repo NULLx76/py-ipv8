@@ -182,11 +182,15 @@ class EZPackOverlay(Overlay):
         # UNPACK
         auth, remainder = self.serializer.unpack_to_serializables([BinMemberAuthenticationPayload, ], data[23:])
         signature_valid, remainder = self._verify_signature(auth, data)
-        format = [GlobalTimeDistributionPayload, payload_class]
-        dist, payload = self.serializer.ez_unpack_serializables(format, remainder[23:])
+
         # ASSERT
         if not signature_valid:
             raise PacketDecodingError("Incoming packet %s has an invalid signature" % payload_class.__name__)
+
+        # UNPACK
+        format = [GlobalTimeDistributionPayload, payload_class]
+        dist, payload = self.serializer.ez_unpack_serializables(format, remainder[23:])
+
         # PRODUCE
         return auth, dist, payload
 
